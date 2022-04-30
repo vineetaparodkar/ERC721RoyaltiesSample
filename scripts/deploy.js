@@ -5,8 +5,9 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 require("dotenv").config();
+const { NFTStorageService } = require("./NFTStorageService");
 
-const { MINTER_ACCOUNT } = process.env;
+const { MINTER_ACCOUNT, ROYALTY_FEES } = process.env || "";
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -25,8 +26,20 @@ async function main() {
   );
 
   await erc721Token.deployed();
-
   console.log("ERC721Token deployed to:", erc721Token.address);
+
+  const ipfsuri = await NFTStorageService(
+    "./assets/pexels-daniel-dan-7708818.jpg"
+  );
+  const uri = `https://ipfs.io/ipfs/${ipfsuri}/metadata.json`;
+  console.log("URL:", uri);
+  const mintTokenTx = await erc721Token.safeMint(
+    MINTER_ACCOUNT,
+    uri,
+    ROYALTY_FEES
+  );
+  mintTokenTx.wait();
+  console.log("Token Minted successfully:");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
