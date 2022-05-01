@@ -26,12 +26,13 @@ contract ERC721Token is ERC721, ERC721Royalty, ERC721URIStorage, AccessControl {
         address to,
         string memory uri,
         uint96 _royaltyFees
-    ) public onlyRole(MINTER_ROLE) {
+    ) public onlyRole(MINTER_ROLE) returns (uint256) {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         _setTokenRoyalty(tokenId, msg.sender, _royaltyFees);
+        return tokenId;
     }
 
     function setRoyaltyInfo(uint96 _royaltyFees, address receiver)
